@@ -14,21 +14,21 @@ typedef struct {
 void existingAccount(AddAccount account[], int *length){
 	*length =15;
 	AddAccount sample[15] = {
-		{"A001","Nguyen Van D","0912345671", 1000,1},
-        {"A002", "Tran Thi B", "0912345672", 1500, 1},
-        {"A003", "Le Van C", "0912345673", 2000, 1},
-        {"A004", "Pham Thi D", "0912345674", 2500, 1},
-        {"A005", "Hoang Van E", "0912345675", 3000, 1},
-        {"A006", "Nguyen Thi F", "0912345676", 3500, 1},
-        {"A007", "Tran Van G", "0912345677", 4000, 1},
-        {"A008", "Le Thi H", "0912345678", 4500, 1},
-        {"A009", "Pham Van I", "0912345679", 5000, 1},
-        {"A010", "Nguyen Van J", "0912345680", 5500, 1},
-        {"A011", "Tran Thi K", "0912345681", 6000, 1},
-        {"A012", "Le Van L", "0912345682", 6500, 1},
-        {"A013", "Pham Thi M", "0912345683", 7000, 1},
-        {"A014", "Hoang Van N", "0912345684", 7500, 1},
-        {"A015", "Nguyen Thi O", "0912345685", 8000, 1}
+		{"001","Nguyen Van D","0912345671", 1000,1},
+        {"002", "Tran Thi B", "0912345672", 1500, 1},
+        {"003", "Le Van C", "0912345673", 2000, 1},
+        {"004", "Pham Thi D", "0912345674", 2500, 1},
+        {"005", "Hoang Van E", "0912345675", 3000, 1},
+        {"006", "Nguyen Thi F", "0912345676", 3500, 1},
+        {"007", "Tran Van G", "0912345677", 4000, 1},
+        {"008", "Le Thi H", "0912345678", 4500, 1},
+        {"009", "Pham Van I", "0912345679", 5000, 1},
+        {"010", "Nguyen Van J", "0912345680", 5500, 1},
+        {"011", "Tran Thi K", "0912345681", 6000, 1},
+        {"012", "Le Van L", "0912345682", 6500, 1},
+        {"013", "Pham Thi M", "0912345683", 7000, 1},
+        {"014", "Hoang Van N", "0912345684", 7500, 1},
+        {"015", "Nguyen Thi O", "0912345685", 8000, 1}
     };
     for(int i = 0; i <15;i++)
         account[i] = sample[i];
@@ -95,10 +95,13 @@ int isValidName(char name[]) {
 
 // Kiểm tra ID hợp lệ
 int isValidID(char id[]) {
-    for (int i = 0; i < (int)strlen(id); i++)
-        if (id[i] == ' ') return 0;
+    if (strlen(id) == 0) return 0; 
+    for (int i = 0; i < (int)strlen(id); i++) {
+        if (!isdigit((unsigned char)id[i])) return 0; 
+    }
     return 1;
 }
+
 
 // Thêm tài khoản
 void enterCustomerInformation(AddAccount account[], int *length) {
@@ -119,7 +122,7 @@ void enterCustomerInformation(AddAccount account[], int *length) {
                 continue;
             }
             if (!isValidID(temp.accountId)) {
-                printf("Loi: ID khong duoc chua khoang trang!\n");
+                printf("Loi: ID khong duoc nhan vui long nhap lai!\n");
                 continue;
             }
             if (isIDDuplicate(account, *length, temp.accountId)) {
