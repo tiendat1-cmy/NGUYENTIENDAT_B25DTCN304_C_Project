@@ -382,8 +382,7 @@ void accountsPagination(AddAccount account[], int length){
 
     while (1) {
         printf("Nhap so trang: ");
-        if (!fgets(buf, sizeof(buf), stdin)) continue;
-        buf[strcspn(buf, "\n")] = '\0';
+        readLine(buf, sizeof(buf));
 
         int valid = 1;
         for (size_t i = 0; i < strlen(buf); i++) {
@@ -408,8 +407,7 @@ void accountsPagination(AddAccount account[], int length){
 
     while (1) {
         printf("Nhap so luong dong muon in (toi da 10): ");
-        if (!fgets(buf, sizeof(buf), stdin)) continue;
-        buf[strcspn(buf, "\n")] = '\0';
+        readLine(buf, sizeof(buf));
 
         int valid = 1;
         for (size_t i = 0; i < strlen(buf); i++) {
@@ -512,92 +510,88 @@ void transferMoney(AddAccount account[], int length, Transaction tran[], int *tr
     int senderIndex, receiverIndex;
     double amount;
 
-    // Nhap ID nguoi gui
+    // Nhap ID nguoi gui 
     while (1) {
         printf("Nhap ID nguoi gui: ");
         readLine(senderId, sizeof(senderId));
 
         if (!isValidID(senderId)) {
-            printf("Loi: ID khong hop le, vui long nhap lai!\n");
+            printf("Loi: ID nguoi gui khong hop le!\n");
             continue;
         }
 
         senderIndex = findIndexByID(account, length, senderId);
         if (senderIndex == -1) {
-            printf("Loi: Tai khoan khong ton tai, vui long nhap lai!\n");
+            printf("Loi: Khong tim thay tai khoan nguoi gui!\n");
             continue;
         }
 
-        if (account[senderIndex].status != 1) {
-            printf("Loi: Tai khoan dang bi khoa, vui long chon tai khoan khac!\n");
-            continue;
+        if (account[senderIndex].status == 0) {
+            printf("Loi: Tai khoan nguoi gui dang bi khoa!\n");
+            return;
         }
-
         break;
     }
 
-    // Nhap ID nguoi nhan
+    // Nhap ID nguoi nhan 
     while (1) {
         printf("Nhap ID nguoi nhan: ");
         readLine(receiverId, sizeof(receiverId));
 
         if (!isValidID(receiverId)) {
-            printf("Loi: ID khong hop le, vui long nhap lai!\n");
+            printf("Loi: ID nguoi nhan khong hop le!\n");
             continue;
         }
 
         receiverIndex = findIndexByID(account, length, receiverId);
         if (receiverIndex == -1) {
-            printf("Loi: Tai khoan khong ton tai, vui long nhap lai!\n");
+            printf("Loi: Khong tim thay tai khoan nguoi nhan!\n");
             continue;
         }
 
-        if (strcmp(senderId, receiverId) == 0) {
-            printf("Loi: Khong the chuyen tien cho chinh minh, vui long nhap lai!\n");
+        if (senderIndex == receiverIndex) {
+            printf("Loi: Khong the chuyen cho chinh minh!\n");
             continue;
         }
 
+        if (account[receiverIndex].status == 0) {
+            printf("Loi: Tai khoan nguoi nhan dang bi khoa!\n");
+            return;
+        }
         break;
     }
 
-    // Nhap so tien
-    char buf[50];
+    // Nhap so tien 
     while (1) {
         printf("Nhap so tien can chuyen: ");
+        char buf[50];
         readLine(buf, sizeof(buf));
 
-        int valid = 1, dotCount = 0;
-        for (size_t i = 0; i < strlen(buf); i++) {
-            if (!isdigit((unsigned char)buf[i])) {
-                if (buf[i] == '.' && dotCount == 0) dotCount++;
-                else valid = 0;
-            }
-        }
-
-        if (!valid || strlen(buf) == 0) {
-            printf("Loi: Vui long nhap so tien hop le (chi nhap so)!\n");
+        if (strlen(buf) == 0) {
+            printf("Loi: Khong duoc bo trong!\n");
             continue;
         }
 
         amount = atof(buf);
+
         if (amount <= 0) {
-            printf("So tien phai lon hon 0!\n");
+            printf("Loi: So tien khong hop le!\n");
             continue;
         }
 
-        if (amount > account[senderIndex].balance) {
+        if (account[senderIndex].balance < amount) {
             printf("Loi: So du khong du!\n");
-            continue;
+            return;
         }
 
         break;
     }
 
-    // Cap nhat so du
+    // Thuc hien chuyen tien 
     account[senderIndex].balance -= amount;
     account[receiverIndex].balance += amount;
 
-    // Luu giao dich
+    // Luu lich su giao dich 
     Transaction t;
     sprintf(t.transId, "T%03d", *transLength + 1);
     strcpy(t.senderId, senderId);
@@ -607,9 +601,10 @@ void transferMoney(AddAccount account[], int length, Transaction tran[], int *tr
     tran[*transLength] = t;
     (*transLength)++;
 
-    printf("Chuyen khoan thanh cong!\n");
+    printf("\nChuyen tien thanh cong!\n");
+    printf("So du nguoi gui: %.2lf\n", account[senderIndex].balance);
+    printf("So du nguoi nhan: %.2lf\n", account[receiverIndex].balance);
 }
-
 // lich su giao dich 
 void showTransactionHistory(AddAccount account[], int length,Transaction tran[],int *transLength) {
     if (length == 0) {
@@ -658,6 +653,7 @@ void showTransactionHistory(AddAccount account[], int length,Transaction tran[],
     if (!found) {
         printf("Khong co giao dich nao!\n");
     }
+
     return;
 }
 int main() {
