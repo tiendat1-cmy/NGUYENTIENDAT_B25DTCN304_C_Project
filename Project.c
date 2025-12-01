@@ -2,6 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+
 typedef struct {
     char accountId[20];
     char fullName[50];
@@ -531,6 +532,23 @@ void transferMoney(AddAccount account[], int length, Transaction tran[], int *tr
         }
         break;
     }
+    int senderIndex = findIndexByID(account, length, senderId);
+    int receiverIndex = findIndexByID(account, length, receiverId);
+
+    if (senderIndex == -1 || receiverIndex == -1) {
+        printf("Loi: senderId hoac receiverId khong ton tai!\n");
+        return;
+    }
+
+    if (strcmp(senderId, receiverId) == 0) {
+        printf("Loi: Khong the chuyen tien cho chinh minh!\n");
+        return;
+    }
+
+    if (account[senderIndex].status != 1) {
+        printf("Loi: Tai khoan dang bi khoa!\n");
+        return;
+    }
 
     // Nhập số tiền
     char buf[50];
@@ -556,24 +574,6 @@ void transferMoney(AddAccount account[], int length, Transaction tran[], int *tr
         break;
     }
 
-    int senderIndex = findIndexByID(account, length, senderId);
-    int receiverIndex = findIndexByID(account, length, receiverId);
-
-    if (senderIndex == -1 || receiverIndex == -1) {
-        printf("Loi: senderId hoac receiverId khong ton tai!\n");
-        return;
-    }
-
-    if (strcmp(senderId, receiverId) == 0) {
-        printf("Loi: Khong the chuyen tien cho chinh minh!\n");
-        return;
-    }
-
-    if (account[senderIndex].status != 1) {
-        printf("Loi: Tai khoan dang bi khoa!\n");
-        return;
-    }
-
     if (amount > account[senderIndex].balance) {
         printf("Loi: So du khong du!\n");
         return;
@@ -585,7 +585,7 @@ void transferMoney(AddAccount account[], int length, Transaction tran[], int *tr
 
     // Lưu giao dịch
     Transaction t;
-    sprintf(t.transId, "T%03d", *transLength + 1);
+    sprintf(t.transId, "T%03d", *transLength + 1);// ghi ket qua vao 1 chuoi 
     strcpy(t.senderId, senderId);
     strcpy(t.receiverId, receiverId);
     t.amount = amount;
