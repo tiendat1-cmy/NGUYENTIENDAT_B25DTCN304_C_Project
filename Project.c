@@ -2,7 +2,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-
 typedef struct {
     char accountId[20];
     char fullName[50];
@@ -108,6 +107,18 @@ int isValidID(char id[]) {
     }
     return 1;
 }
+// kiem tra phone 
+int isValidPhone(char phone[]) {
+    if (phone == NULL || strlen(phone) == 0) return 0;
+    int len = strlen(phone);
+    if (len > 10) return 0;  
+
+    for (int i = 0; i < len; i++) {
+        if (!isdigit((unsigned char)phone[i]))return 0;
+    }
+    return 1;
+}
+
 // Thêm tài khoản
 void enterCustomerInformation(AddAccount account[], int *length) {
     int size = inputMenuChoice("Nhap so luong tai khoan muon them", 1, 100);
@@ -156,35 +167,21 @@ void enterCustomerInformation(AddAccount account[], int *length) {
 
         // Nhập SDT
         while (1) {
-            printf("Nhap so dien thoai (1-10 chu so): ");
-            fflush(stdout);
-            readLine(temp.phone, sizeof(temp.phone));
+        printf("Nhap so dien thoai (1-10 chu so): ");
+        fflush(stdout);
+        readLine(temp.phone, sizeof(temp.phone));
 
-            int len = strlen(temp.phone);
-            if (len == 0) {
-                printf("Loi: SDT khong duoc rong!\n");
-                continue;
-            }
-            if (len > 10) {
-                printf("Loi: SDT chi duoc nhap toi da 10 chu so!\n");
-                continue;
-            }
-
-            int isDigitOnly = 1;
-            for (int j = 0; j < len; j++)
-                if (!isdigit((unsigned char)temp.phone[j])) { isDigitOnly = 0; break; }
-
-            if (!isDigitOnly) {
-                printf("Loi: SDT chi duoc chua chu so!\n");
-                continue;
-            }
-            if (isPhoneDuplicate(account, *length, temp.phone, -1)) {
-                printf("Loi: SDT da ton tai!\n");
-                continue;
-            }
-            break;
+        if (!isValidPhone(temp.phone)) {
+        printf("Loi: SDT khong hop le! Vui long nhap lai.\n");
+        continue;
         }
 
+        if (isPhoneDuplicate(account, *length, temp.phone, -1)) {
+        printf("Loi: SDT da ton tai!\n");
+        continue;
+        }
+        break;
+        }
         temp.balance = 0.0;
         temp.status = 1;
 
@@ -277,6 +274,7 @@ void updateAccount(AddAccount account[], int length) {
 
 // Quản lý trạng thái: khóa/xóa luôn
 void manageStatus(AddAccount account[], int *length) {
+	
     if (*length == 0) {
         printf("Vui long them it nhat 1 tai khoan truoc!\n");
         return;
