@@ -2,14 +2,14 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-
+#include <time.h>
 typedef struct {
     char accountId[20];
     char fullName[50];
     char phone[15];
     double balance;
     int status; 
-} AddAccount;
+}Account;
 typedef struct{
 	char transId[20];
 	char senderId[20];
@@ -18,9 +18,9 @@ typedef struct{
 	char type[10];
 	char date[20];
 }Transaction;
-void existingAccount(AddAccount account[], int *length){
+void existingAccount(Account account[], int *length){
 	*length =15;
-	AddAccount sample[15] = {
+	Account sample[15] = {
 		{"001","Nguyen Van D","0912345671", 1000,1},
         {"002", "Tran Thi B", "0912345672", 1500, 1},
         {"003", "Le Van C", "0912345673", 2000, 1},
@@ -83,24 +83,24 @@ int inputMenuChoice(const char suggest[], int min, int max) {
     }
 }
 
-int isIDDuplicate(AddAccount account[], int length, char id[]) {
+int isIDDuplicate(Account account[], int length, char id[]) {
     for (int i = 0; i < length; i++)
         if (strcmp(account[i].accountId, id) == 0) return 1;
     return 0;
 }
-int isPhoneDuplicate(AddAccount account[], int length, char phone[], int ignoreIndex) {
+int isPhoneDuplicate(Account account[], int length, char phone[], int ignoreIndex) {
     for (int i = 0; i < length; i++)
         if (i != ignoreIndex && strcmp(account[i].phone, phone) == 0) return 1;
     return 0;
 }
-
+// kiem tra ten
 int isValidName(char name[]) {
     for (int i = 0; i < (int)strlen(name); i++)
         if (!isalpha((unsigned char)name[i]) && name[i] != ' ') return 0;
     return 1;
 }
 
-// Kiểm tra ID hợp lệ
+// kiem tra ID
 int isValidID(char id[]) {
     if (strlen(id) == 0) return 0; 
     for (int i = 0; i < (int)strlen(id); i++) {
@@ -121,11 +121,11 @@ int isValidPhone(char phone[]) {
 }
 
 // Thêm tài khoản
-void enterCustomerInformation(AddAccount account[], int *length) {
+void enterCustomerInformation(Account account[], int *length) {
     int size = inputMenuChoice("Nhap so luong tai khoan muon them", 1, 100);
 
     for (int i = 0; i < size; i++) {
-        AddAccount temp;
+        Account temp;
         printf("\n=== Nhap tai khoan thu %d ===\n", i + 1);
 
         // Nhập ID
@@ -134,10 +134,6 @@ void enterCustomerInformation(AddAccount account[], int *length) {
             fflush(stdout);
             readLine(temp.accountId, sizeof(temp.accountId));
 
-            if (strlen(temp.accountId) == 0) {
-                printf("Loi: ID khong duoc rong!\n");
-                continue;
-            }
             if (!isValidID(temp.accountId)) {
                 printf("Loi: ID khong duoc nhan vui long nhap lai!\n");
                 continue;
@@ -194,14 +190,14 @@ void enterCustomerInformation(AddAccount account[], int *length) {
 }
 
 // Tìm index theo ID
-int findIndexByID(AddAccount account[], int length, char accountId[]) {
+int findIndexByID(Account account[], int length, char accountId[]) {
     for (int i = 0; i < length; i++)
         if (strcmp(account[i].accountId, accountId) == 0) return i;
     return -1;
 }
 
 // Cập nhật thông tin tài khoản
-void updateAccount(AddAccount account[], int length) {
+void updateAccount(Account account[], int length) {
     if (length == 0) {
         printf("Vui long them it nhat 1 tai khoan truoc!\n");
         return;
@@ -274,7 +270,7 @@ void updateAccount(AddAccount account[], int length) {
 
 
 // Quản lý trạng thái: khóa/xóa luôn
-void manageStatus(AddAccount account[], int *length) {
+void manageStatus(Account account[], int *length) {
 	
     if (*length == 0) {
         printf("Vui long them it nhat 1 tai khoan truoc!\n");
@@ -326,7 +322,7 @@ void manageStatus(AddAccount account[], int *length) {
 }
 
 // Tìm kiếm tài khoản
-void searchAccount(AddAccount account[], int length) {
+void searchAccount(Account account[], int length) {
     if (length == 0) {
         printf("Vui long them it nhat 1 tai khoan truoc khi tim kiem!\n");
         return;
@@ -371,7 +367,7 @@ void searchAccount(AddAccount account[], int length) {
     }
 }
 //Danh sách (phân / trang)
-void accountsPagination(AddAccount account[], int length){
+void accountsPagination(Account account[], int length){
     if (length == 0){
         printf("Chua co tai khoan nao !\n");
         return;
@@ -457,7 +453,7 @@ char* getLastName(char fullName[]) {
     return last + 1; 
 }
 
-void sortAccount(AddAccount account[], int length) {
+void sortAccount(Account account[], int length) {
     if (length == 0) {
         printf("Khong co du lieu can sap xep!\n");
         return;
@@ -473,7 +469,7 @@ void sortAccount(AddAccount account[], int length) {
             for (int i = 0; i < length - 1; i++) {
                 for (int j = i + 1; j < length; j++) {
                     if (account[i].balance < account[j].balance) {
-                        AddAccount tmp = account[i];
+                        Account tmp = account[i];
                         account[i] = account[j];
                         account[j] = tmp;
                     }
@@ -487,7 +483,7 @@ void sortAccount(AddAccount account[], int length) {
                     if (strcmp(getLastName(account[i].fullName),
                        getLastName(account[j].fullName)) > 0) {
 
-                        AddAccount tmp = account[i];
+                        Account tmp = account[i];
                         account[i] = account[j];
                         account[j] = tmp;
                     }
@@ -500,7 +496,7 @@ void sortAccount(AddAccount account[], int length) {
     }
 }
 //Giao dich chuyen khoan 
-void transferMoney(AddAccount account[], int length, Transaction tran[], int *transLength) {
+void transferMoney(Account account[], int length, Transaction tran[], int *transLength) {
     if (length == 0) {
         printf("Khong co du lieu can chuyen khoan!\n");
         return;
@@ -597,7 +593,10 @@ void transferMoney(AddAccount account[], int length, Transaction tran[], int *tr
     strcpy(t.senderId, senderId);
     strcpy(t.receiverId, receiverId);
     t.amount = amount;
-
+    // ngay gio 
+    time_t now = time(NULL);
+    struct tm *tm_info = localtime(&now);
+    strftime(t.date, sizeof(t.date), "%Y-%m-%d %H:%M:%S", tm_info);
     tran[*transLength] = t;
     (*transLength)++;
 
@@ -606,7 +605,7 @@ void transferMoney(AddAccount account[], int length, Transaction tran[], int *tr
     printf("So du nguoi nhan: %.2lf\n", account[receiverIndex].balance);
 }
 // lich su giao dich 
-void showTransactionHistory(AddAccount account[], int length,Transaction tran[],int *transLength) {
+void showTransactionHistory(Account account[], int length,Transaction tran[],int *transLength) {
     if (length == 0) {
         printf("He thong chua co tai khoan nao!\n");
         return;
@@ -638,8 +637,8 @@ void showTransactionHistory(AddAccount account[], int length,Transaction tran[],
             strcmp(tran[i].receiverId, targetId) == 0) 
         {
             found = 1;
-            printf("%d. Ma GD: %s | ", i + 1, tran[i].transId);
-
+             printf("%d. Ma GD: %s | Ngay gio: %s | ",
+                   i + 1, tran[i].transId, tran[i].date);
             if (strcmp(tran[i].senderId, targetId) == 0) {
                 printf("Loai: OUT | Gui den: %s | So tien: %.2f\n",
                        tran[i].receiverId, tran[i].amount);
@@ -657,7 +656,7 @@ void showTransactionHistory(AddAccount account[], int length,Transaction tran[],
     return;
 }
 int main() {
-    AddAccount account[100];
+    Account account[100];
     int length = 0;
     existingAccount(account, &length);
     int choice;
